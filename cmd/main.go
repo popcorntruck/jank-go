@@ -1,0 +1,34 @@
+package main
+
+import (
+	"github.com/popcorntruck/jank-go/internal/input"
+	"github.com/popcorntruck/jank-go/internal/macro"
+)
+
+const (
+	VALUE_KEY_PRESSED  = 1
+	VALUE_KEY_HELD     = 2
+	VALUE_KEY_RELEASED = 0
+)
+
+func main() {
+	engine := macro.NewMacroEngine()
+	defer engine.Close()
+
+	engine.RunScriptFile("macro.lua")
+
+	// Initialize the input receiver
+	recv, err := input.NewInputReceiver()
+
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+		event := <-recv.Events()
+
+		if event.Value == VALUE_KEY_PRESSED {
+			engine.TryCallByHotkey(event.CodeName())
+		}
+	} // Block forever until interrupted (e.g., Ctrl+C)
+}
