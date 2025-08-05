@@ -5,10 +5,12 @@ macro("notify", {
     end
 })
 
-macro("print_and_notify", {
-    hotkey = "KEY_Q",
+macro("j", {
+    hotkey = "KEY_J",
     action = function()
-       print("you can print stuff too!!")
-       send_notification("The other macro ran")
+        local res = exec(
+           "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.OpenUri string:'spotify:track:6C2nVSSeXNqfoY8t6tliZ4'"
+        )
+        print(res)
     end
 })
