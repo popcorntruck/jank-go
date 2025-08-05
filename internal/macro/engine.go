@@ -64,7 +64,6 @@ func (e *MacroEngine) initLuaState() {
 
 	e.luaState.SetGlobal("print", e.luaState.NewFunction(e.logger.LHandleScriptLog))
 	e.luaState.SetGlobal("send_notification", e.luaState.NewFunction(lHandleSendNotification))
-	e.luaState.SetGlobal("exec", e.luaState.NewFunction(lHandleExec))
 }
 
 func (e *MacroEngine) lHandleRegisterMacro(ls *lua.LState) int {
@@ -104,22 +103,4 @@ func lHandleSendNotification(ls *lua.LState) int {
 
 	ls.Push(lua.LNil)
 	return 1
-}
-
-func lHandleExec(ls *lua.LState) int {
-	command := ls.CheckString(1)
-
-	// not everyone uses bash btw
-	cmd := exec.Command("bash", "-c", command)
-	output, err := cmd.CombinedOutput()
-
-	if err != nil {
-		ls.Push(lua.LNil)
-		ls.Push(lua.LString(err.Error()))
-		return 2
-	}
-
-	ls.Push(lua.LString(string(output)))
-	ls.Push(lua.LNil)
-	return 2
 }
