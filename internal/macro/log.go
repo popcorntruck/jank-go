@@ -31,7 +31,7 @@ func (l *MacroLogger) Log(message string) {
 }
 
 // Lua function to handle script logging, bound to the global `print` function
-func (l *MacroLogger) LHandleScriptLog(ls *lua.LState) int {
+func (l *MacroLogger) lHandleScriptLog(ls *lua.LState) int {
 	value := ls.Get(1)
 
 	logMessage := value.String()

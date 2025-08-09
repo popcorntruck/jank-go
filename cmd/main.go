@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/popcorntruck/jank-go/internal/input"
 	"github.com/popcorntruck/jank-go/internal/macro"
+	"github.com/popcorntruck/jank-go/internal/window"
 )
 
 const (
@@ -12,6 +13,11 @@ const (
 )
 
 func main() {
+	_, err := window.DetermineAndCreateWindowService()
+	if err != nil {
+		panic(err)
+	}
+
 	engine := macro.NewMacroEngine()
 	defer engine.Close()
 
