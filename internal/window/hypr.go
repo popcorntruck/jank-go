@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+const (
+	EVENT_ACTIVE_WINDOW = "activewindow"
+)
+
 type HyprWindowService struct {
 	socket       net.Conn
 	activeWindow *WindowInfo
@@ -48,7 +52,7 @@ func NewHyprWindowService() (*HyprWindowService, error) {
 			}
 			event, data := parseEvent(line)
 
-			if event == "activewindow" {
+			if event == EVENT_ACTIVE_WINDOW {
 				windowData := strings.SplitN(data, ",", 2)
 				if len(windowData) < 2 {
 					log.Println("Invalid activewindow data:", data)
@@ -62,7 +66,7 @@ func NewHyprWindowService() (*HyprWindowService, error) {
 
 				ws.activeWindow = &window
 
-				log.Printf("[WindowService:hypr] activewindow >> %+v\n", window)
+				// log.Printf("[WindowService:hypr] activewindow >> %+v\n", window)
 			}
 		}
 	}()
@@ -78,7 +82,7 @@ func (s *HyprWindowService) Close() error {
 // Gets the active window information.
 // Will be nil if the socket can't connect, or a activewindow event hasn't been sent
 // since the WindowService was created.
-func (s *HyprWindowService) ActiveWindow() *WindowInfo {
+func (s *HyprWindowService) GetActiveWindow() *WindowInfo {
 	return s.activeWindow
 }
 

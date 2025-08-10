@@ -8,7 +8,8 @@ macro("notify", {
            
            coroutine.wrap(function()
                 while started do
-                send_notification("Start")
+                send_notification("click")
+                   send_click()
                    
                   sleep(1000)
                 end

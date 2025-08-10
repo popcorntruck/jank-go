@@ -12,16 +12,16 @@ type WindowInfo struct {
 
 type WindowService interface {
 	Close() error
-	ActiveWindow() *WindowInfo
+	GetActiveWindow() *WindowInfo
 }
 
-func DetermineAndCreateWindowService() (WindowService, error) {
+func GetPlatformWindowService() (WindowService, error) {
 	wm := os.Getenv("XDG_CURRENT_DESKTOP")
 
 	if wm == "Hyprland" {
 		return NewHyprWindowService()
 	} else {
-		log.Printf("[WindowService] window manager %v not supported, using NoopWindowService", wm)
+		log.Printf("[GetPlatformWindowService] window manager %v not supported, using NoopWindowService", wm)
 		return NewNoopWindowService()
 	}
 }

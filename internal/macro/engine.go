@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/popcorntruck/jank-go/internal/input"
 	"github.com/popcorntruck/jank-go/internal/window"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -12,19 +13,22 @@ import (
 type MacroEngine struct {
 	collection    *macroCollection
 	windowService window.WindowService
+	inputSender   input.InputSender
 
 	luaState *lua.LState
 	logger   *MacroLogger
 }
 
 func NewMacroEngine() *MacroEngine {
-	ws, _ := window.DetermineAndCreateWindowService()
+	ws, _ := window.GetPlatformWindowService()
+	is, _ := input.GetPlatformInputSender()
 
 	e := &MacroEngine{
 		collection:    newMacroCollection(),
 		luaState:      lua.NewState(),
 		logger:        NewMacroLogger(),
 		windowService: ws,
+		inputSender:   is,
 	}
 
 	e.initLuaState()
@@ -52,7 +56,7 @@ func (e *MacroEngine) TryCallByHotkey(hotkey string) error {
 		return nil // No macro registered for this hotkey
 	}
 
-	log.Printf("[MacroEngine] macro '%s' bound to '%s'", macro.Name, hotkey)
+	log.Printf("[MacroEngine] executing macro '%s' bound to '%s'", macro.Name, hotkey)
 
 	if macro.Action != nil {
 		go func() {
@@ -78,6 +82,8 @@ func (e *MacroEngine) initLuaState() {
 	e.luaState.SetGlobal("send_notification", e.luaState.NewFunction(lHandleSendNotification))
 
 	e.luaState.SetGlobal("win_class_active", e.luaState.NewFunction(window.CreateLWinClassActive(e.windowService)))
+
+	e.luaState.SetGlobal("send_click", e.luaState.NewFunction(input.CreateLClick(e.inputSender)))
 }
 
 func (e *MacroEngine) lHandleRegisterMacro(ls *lua.LState) int {
@@ -93,7 +99,10 @@ func (e *MacroEngine) lHandleRegisterMacro(ls *lua.LState) int {
 		return 0
 	}
 
-	macro := &Macro{Name: name}
+	macro := &Macro{
+		Name:   name,
+		Config: MacroConfigFromTable(config),
+	}
 
 	if hotkey := config.RawGetString("hotkey"); hotkey != lua.LNil {
 		macro.Hotkey = hotkey.String()

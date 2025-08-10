@@ -11,6 +11,6 @@ func (s *NoopWindowService) Close() error {
 	return nil
 }
 
-func (s *NoopWindowService) ActiveWindow() *WindowInfo {
+func (s *NoopWindowService) GetActiveWindow() *WindowInfo {
 	return nil
 }

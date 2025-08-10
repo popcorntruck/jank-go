@@ -13,7 +13,7 @@ const (
 )
 
 func main() {
-	_, err := window.DetermineAndCreateWindowService()
+	_, err := window.GetPlatformWindowService()
 	if err != nil {
 		panic(err)
 	}

@@ -10,7 +10,7 @@ func CreateLWinClassActive(ws WindowService) func(ls *lua.LState) int {
 	return func(ls *lua.LState) int {
 		targetClass := ls.CheckString(1)
 
-		aw := ws.ActiveWindow()
+		aw := ws.GetActiveWindow()
 		if aw == nil {
 			log.Printf("[CreateLWinClassActive] No active window found")
 			ls.Push(lua.LBool(false))
