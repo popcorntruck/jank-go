@@ -10,7 +10,7 @@ macro("notify", {
                 while started do
                 send_notification("click")
                    send_click()
-                   
+
                   sleep(1000)
                 end
             end)()
@@ -22,14 +22,28 @@ macro("notify", {
     end
 })
 
-macro("j", {
-    hotkey = "KEY_J",
-    action = function()
-        if not win_class_active("spotify") then
-          local res = os.execute(
-             "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.OpenUri string:'spotify:track:6C2nVSSeXNqfoY8t6tliZ4'"
-          )
-          print(res)
+local function create_spotify_macro(uri) 
+    return function ()
+        if win_class_active("spotify") or win_class_active("com.spotify.client") then
+            os.execute(
+                string.format("dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.OpenUri string:'%s'", uri)
+            )
         end
     end
+end
+
+macro("t", {
+    hotkey = "KEY_T",
+    action = create_spotify_macro("spotify:track:0jNhSK5gotdRB1G4nMqEau")
 })
+
+macro("y", {
+    hotkey = "KEY_Y",
+    action = create_spotify_macro("spotify:artist:5K4W6rqBFWDnAN6FQUkS6x")
+})
+
+macro("j", {
+    hotkey = "KEY_J",
+    action = create_spotify_macro("spotify:track:6C2nVSSeXNqfoY8t6tliZ4")
+})
+
